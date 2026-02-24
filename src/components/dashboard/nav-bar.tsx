@@ -177,6 +177,7 @@ export function NavBar() {
             onClick={handleRefresh}
             className="p-2 max-md:p-1.5 text-text3 hover:text-text2 transition-colors font-mono text-callout cursor-pointer"
             title="Refresh"
+            aria-label="Refresh page"
           >
             ↺
           </button>
@@ -187,6 +188,7 @@ export function NavBar() {
                        text-footnote uppercase tracking-[0.04em] px-3 py-2
                        max-md:text-callout max-md:px-1.5 max-md:py-1.5"
             title="Sign out"
+            aria-label="Sign out"
           >
             <span className="max-md:hidden">Sign out</span>
             <span className="md:hidden">⏻</span>

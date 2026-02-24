@@ -14,9 +14,9 @@ export function AnalyticsProvider({ children }: { children: React.ReactNode }) {
     if (typeof window === "undefined") return;
     if (!process.env.NEXT_PUBLIC_POSTHOG_KEY) return;
 
-    // Check cookie consent
+    // Only initialize if user has explicitly accepted cookies (GDPR)
     const consent = localStorage.getItem("grova-cookie-consent");
-    if (consent === "declined") return;
+    if (consent !== "accepted") return;
 
     // Dynamic import to avoid bundling when not configured
     import("posthog-js")

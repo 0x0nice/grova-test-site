@@ -62,6 +62,7 @@ export function WaitlistForm({ className = "" }: WaitlistFormProps) {
           onChange={(e) => { setEmail(e.target.value); setError(false); }}
           onKeyDown={handleKeyDown}
           placeholder="your@email.com"
+          aria-label="Email address"
           className={`
             flex-1 bg-surface border rounded
             px-4 py-3 font-mono text-callout font-light text-text
