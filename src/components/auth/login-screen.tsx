@@ -55,8 +55,8 @@ export function LoginScreen() {
   return (
     <div className="min-h-screen bg-bg flex flex-col">
       {/* Nav */}
-      <nav className="flex items-center justify-between px-10 py-5 max-md:px-5">
-        <Logo size="sm" />
+      <nav className="flex items-center justify-between px-10 py-6 max-md:px-5">
+        <Logo size="lg" />
         <div className="flex items-center gap-3">
           <Link
             href="/"

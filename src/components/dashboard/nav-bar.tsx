@@ -100,7 +100,7 @@ export function NavBar() {
       <div className="flex items-center h-12 px-5 gap-4 max-md:gap-2 max-md:px-3 md:h-16 md:flex-1 overflow-hidden">
         {/* Logo */}
         <div className="flex items-center gap-2 shrink-0 max-md:mr-0 mr-2">
-          <Logo size="sm" href="/dashboard" />
+          <Logo size="md" href="/dashboard" />
           <span className="font-mono text-micro text-text3 uppercase tracking-[0.1em] max-md:hidden">
             dashboard
           </span>
