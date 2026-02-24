@@ -24,18 +24,23 @@ export function TrackProvider({ children }: { children: ReactNode }) {
   const [track, setTrackState] = useState<Track>("dev");
 
   useEffect(() => {
-    const hash = window.location.hash === "#business" ? "biz" : null;
-    const saved = localStorage.getItem("grova-track") as Track | null;
-    const initial = hash || saved || "dev";
-    setTrackState(initial);
-    document.documentElement.setAttribute("data-track", initial);
+    try {
+      const hash = window.location.hash === "#business" ? "biz" : null;
+      let saved: string | null = null;
+      try { saved = localStorage.getItem("grova-track"); } catch {}
+      const initial = hash || (saved as Track) || "dev";
+      setTrackState(initial);
+      document.documentElement.setAttribute("data-track", initial);
+    } catch {
+      // Fallback: keep default "dev" track
+    }
   }, []);
 
   const setTrack = useCallback((t: Track) => {
     setTrackState(t);
     document.documentElement.setAttribute("data-track", t);
-    localStorage.setItem("grova-track", t);
-    history.replaceState(null, "", t === "biz" ? "#business" : "#");
+    try { localStorage.setItem("grova-track", t); } catch {}
+    try { history.replaceState(null, "", t === "biz" ? "#business" : "#"); } catch {}
   }, []);
 
   return (
