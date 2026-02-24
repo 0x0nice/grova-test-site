@@ -18,7 +18,7 @@ export function Header() {
             Early Access
           </span>
           <Link
-            href="/dashboard?demo=true"
+            href="/dashboard/inbox?demo"
             className="bg-[var(--track-accent)] text-black border border-[var(--track-accent)]
                        rounded px-3.5 py-1.5
                        font-mono text-[0.65rem] font-semibold tracking-[0.04em]
@@ -28,7 +28,7 @@ export function Header() {
             Try Demo
           </Link>
           <Link
-            href="/dashboard"
+            href="/login"
             className="bg-transparent border border-border2 rounded
                        text-text2 cursor-pointer font-mono text-[0.65rem] font-medium
                        tracking-[0.04em] px-3 py-1.5 no-underline

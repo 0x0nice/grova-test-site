@@ -52,6 +52,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return;
     }
 
+    // Skip Supabase if env vars aren't configured
+    if (
+      !process.env.NEXT_PUBLIC_SUPABASE_URL ||
+      !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    ) {
+      setLoading(false);
+      return;
+    }
+
     const supabase = createClient();
 
     // Get initial session
