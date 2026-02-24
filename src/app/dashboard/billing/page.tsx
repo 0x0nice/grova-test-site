@@ -1,10 +1,23 @@
 "use client";
 
+import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "@/providers/auth-provider";
 import { useProjectStore } from "@/stores/project-store";
 import { EmptyState } from "@/components/ui/empty-state";
+import { apiGet, apiPost } from "@/lib/api";
 
-const DEV_TIERS = [
+/* ── Tier definitions (display only — no Stripe IDs needed) ── */
+
+interface Tier {
+  name: string;
+  key: string;
+  price: string;
+  period: string;
+  features: string[];
+  popular?: boolean;
+}
+
+const DEV_TIERS: Tier[] = [
   {
     name: "Free",
     key: "free",
@@ -55,7 +68,7 @@ const DEV_TIERS = [
   },
 ];
 
-const BIZ_TIERS = [
+const BIZ_TIERS: Tier[] = [
   {
     name: "Free",
     key: "biz_free",
@@ -106,12 +119,146 @@ const BIZ_TIERS = [
   },
 ];
 
+/* ── Billing status type from API ── */
+
+interface BillingStatus {
+  plan_tier: string;
+  plan_status: string;
+  current_period_end: string | null;
+  usage: {
+    feedback_count: number;
+    feedback_limit: number;
+  };
+}
+
+/* ── Tier ordering for upgrade/downgrade labels ── */
+
+const TIER_ORDER: Record<string, number> = {
+  free: 0,
+  biz_free: 0,
+  solo: 1,
+  biz_essentials: 1,
+  builder: 2,
+  biz_growth: 2,
+  agency: 3,
+  biz_multi: 3,
+};
+
+/* ── Component ── */
+
 export default function BillingPage() {
-  const { isDemo } = useAuth();
+  const { session, isDemo } = useAuth();
   const active = useProjectStore((s) => s.active);
   const isBiz = active?.mode === "business";
   const tiers = isBiz ? BIZ_TIERS : DEV_TIERS;
-  const currentPlan = "free"; // TODO: fetch from billing API
+
+  const [billing, setBilling] = useState<BillingStatus | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
+
+  const token = session?.access_token;
+
+  // Check for success/cancelled URL params
+  useEffect(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("success") === "true") {
+        setSuccessMsg("Subscription activated! Your plan has been upgraded.");
+        // Clean URL
+        window.history.replaceState({}, "", window.location.pathname);
+      }
+      if (params.get("cancelled") === "true") {
+        setError("Checkout was cancelled.");
+        window.history.replaceState({}, "", window.location.pathname);
+      }
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
+  // Fetch billing status
+  useEffect(() => {
+    if (!token || isDemo || !active) {
+      setLoading(false);
+      return;
+    }
+
+    let cancelled = false;
+
+    async function fetchStatus() {
+      try {
+        const data = await apiGet<BillingStatus>(
+          `/billing/status?projectId=${active!.id}`,
+          token!
+        );
+        if (!cancelled) setBilling(data);
+      } catch {
+        // API may return 503 if Stripe not configured — fall back to free
+        if (!cancelled) setBilling(null);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+
+    fetchStatus();
+    return () => {
+      cancelled = true;
+    };
+  }, [token, isDemo, active]);
+
+  const currentPlan = billing?.plan_tier || "free";
+  const currentOrder = TIER_ORDER[currentPlan] ?? 0;
+
+  // Handle upgrade click
+  const handleUpgrade = useCallback(
+    async (tierKey: string) => {
+      if (!token || isDemo) return;
+      setActionLoading(tierKey);
+      setError(null);
+
+      try {
+        const data = await apiPost<{ url: string }>(
+          "/billing/checkout",
+          { tier: tierKey, projectId: active?.id },
+          token
+        );
+        if (data.url) {
+          window.location.href = data.url;
+        }
+      } catch (err) {
+        setError("Failed to start checkout. Please try again.");
+        console.error("[billing] Checkout error:", err);
+      } finally {
+        setActionLoading(null);
+      }
+    },
+    [token, isDemo, active]
+  );
+
+  // Handle manage subscription click
+  const handleManage = useCallback(async () => {
+    if (!token || isDemo) return;
+    setActionLoading("manage");
+    setError(null);
+
+    try {
+      const data = await apiPost<{ url: string }>(
+        "/billing/portal",
+        { projectId: active?.id },
+        token
+      );
+      if (data.url) {
+        window.location.href = data.url;
+      }
+    } catch (err) {
+      setError("Failed to open billing portal. Please try again.");
+      console.error("[billing] Portal error:", err);
+    } finally {
+      setActionLoading(null);
+    }
+  }, [token, isDemo, active]);
 
   if (!active) {
     return (
@@ -123,8 +270,32 @@ export default function BillingPage() {
     );
   }
 
+  const feedbackCount = billing?.usage?.feedback_count ?? 0;
+  const feedbackLimit = billing?.usage?.feedback_limit ?? 50;
+  const periodEnd = billing?.current_period_end
+    ? new Date(billing.current_period_end).toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      })
+    : null;
+
   return (
     <div>
+      {/* Success banner */}
+      {successMsg && (
+        <div className="bg-accent/10 border border-accent/30 rounded p-4 mb-4">
+          <p className="font-mono text-footnote text-accent">{successMsg}</p>
+        </div>
+      )}
+
+      {/* Error banner */}
+      {error && (
+        <div className="bg-red/10 border border-red/30 rounded p-4 mb-4" role="alert">
+          <p className="font-mono text-footnote text-red">{error}</p>
+        </div>
+      )}
+
       {/* Current plan banner */}
       <div className="bg-surface border border-border rounded p-5 mb-6">
         <div className="flex items-center justify-between flex-wrap gap-3">
@@ -132,22 +303,34 @@ export default function BillingPage() {
             <span className="block font-mono text-micro text-text3 uppercase tracking-[0.12em] mb-1">
               Current Plan
             </span>
-            <span className="font-serif text-title text-text italic">
-              {tiers.find((t) => t.key === currentPlan)?.name || "Free"}
-            </span>
+            {loading ? (
+              <span className="block h-7 w-24 bg-border/30 rounded animate-pulse" />
+            ) : (
+              <span className="font-serif text-title text-text italic">
+                {tiers.find((t) => t.key === currentPlan)?.name || "Free"}
+              </span>
+            )}
           </div>
           <div className="flex items-center gap-3">
-            {currentPlan !== "free" && (
+            {currentPlan !== "free" && currentPlan !== "biz_free" && (
               <button
+                onClick={handleManage}
+                disabled={isDemo || actionLoading === "manage"}
                 className="font-mono text-footnote text-text3 hover:text-text2
                            px-4 py-2 rounded border border-border hover:border-border2
-                           transition-colors cursor-pointer uppercase tracking-[0.04em]"
+                           transition-colors cursor-pointer uppercase tracking-[0.04em]
+                           disabled:opacity-30 disabled:cursor-not-allowed"
               >
-                Manage Subscription
+                {actionLoading === "manage" ? "Opening..." : "Manage Subscription"}
               </button>
             )}
           </div>
         </div>
+        {billing?.plan_status === "past_due" && (
+          <p className="font-mono text-micro text-red mt-3">
+            Payment past due — please update your payment method to keep your plan active.
+          </p>
+        )}
         {isDemo && (
           <p className="font-mono text-micro text-orange mt-3">
             Demo mode — billing actions are disabled.
@@ -162,6 +345,11 @@ export default function BillingPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         {tiers.map((tier) => {
           const isCurrent = tier.key === currentPlan;
+          const tierOrder = TIER_ORDER[tier.key] ?? 0;
+          const isUpgrade = tierOrder > currentOrder;
+          const isDowngrade = tierOrder < currentOrder;
+          const isFree = tier.key === "free" || tier.key === "biz_free";
+
           return (
             <div
               key={tier.key}
@@ -206,9 +394,21 @@ export default function BillingPage() {
                 <span className="font-mono text-micro text-text3 uppercase tracking-[0.04em] text-center py-2">
                   Current Plan
                 </span>
+              ) : isFree && currentOrder > 0 ? (
+                <button
+                  onClick={handleManage}
+                  disabled={isDemo || !!actionLoading}
+                  className="font-mono text-micro uppercase tracking-[0.04em] py-2.5 rounded
+                    transition-all cursor-pointer text-center
+                    border border-border text-text3 hover:border-border2 hover:text-text2
+                    disabled:opacity-30 disabled:cursor-not-allowed"
+                >
+                  Downgrade
+                </button>
               ) : (
                 <button
-                  disabled={isDemo}
+                  onClick={() => handleUpgrade(tier.key)}
+                  disabled={isDemo || !!actionLoading}
                   className={`
                     font-mono text-micro uppercase tracking-[0.04em] py-2.5 rounded
                     transition-all cursor-pointer text-center
@@ -222,7 +422,13 @@ export default function BillingPage() {
                     disabled:opacity-30 disabled:cursor-not-allowed
                   `}
                 >
-                  {tier.price === "$0" ? "Downgrade" : "Upgrade"}
+                  {actionLoading === tier.key
+                    ? "Redirecting..."
+                    : isDowngrade
+                    ? "Downgrade"
+                    : isUpgrade
+                    ? "Upgrade"
+                    : "Select"}
                 </button>
               )}
             </div>
@@ -240,30 +446,63 @@ export default function BillingPage() {
             <span className="block font-mono text-micro text-text3 mb-1">
               Feedback received
             </span>
-            <span className="font-serif text-title text-text italic">0</span>
-            <span className="font-mono text-micro text-text3"> / 50</span>
+            {loading ? (
+              <span className="block h-7 w-16 bg-border/30 rounded animate-pulse" />
+            ) : (
+              <>
+                <span className="font-serif text-title text-text italic">
+                  {feedbackCount}
+                </span>
+                <span className="font-mono text-micro text-text3">
+                  {" "}
+                  / {feedbackLimit === -1 ? "∞" : feedbackLimit}
+                </span>
+              </>
+            )}
           </div>
           <div>
             <span className="block font-mono text-micro text-text3 mb-1">
-              Projects
+              Plan status
             </span>
-            <span className="font-serif text-title text-text italic">1</span>
-            <span className="font-mono text-micro text-text3"> / 1</span>
+            {loading ? (
+              <span className="block h-7 w-16 bg-border/30 rounded animate-pulse" />
+            ) : (
+              <span
+                className={`font-mono text-footnote capitalize ${
+                  billing?.plan_status === "active"
+                    ? "text-accent"
+                    : billing?.plan_status === "past_due"
+                    ? "text-red"
+                    : "text-text2"
+                }`}
+              >
+                {billing?.plan_status || "active"}
+              </span>
+            )}
           </div>
           <div>
             <span className="block font-mono text-micro text-text3 mb-1">
-              AI triage runs
+              Current tier
             </span>
-            <span className="font-serif text-title text-text italic">0</span>
-            <span className="font-mono text-micro text-text3"> / 50</span>
+            {loading ? (
+              <span className="block h-7 w-16 bg-border/30 rounded animate-pulse" />
+            ) : (
+              <span className="font-serif text-title text-text italic">
+                {tiers.find((t) => t.key === currentPlan)?.name || "Free"}
+              </span>
+            )}
           </div>
           <div>
             <span className="block font-mono text-micro text-text3 mb-1">
               Period ends
             </span>
-            <span className="font-mono text-footnote text-text2">
-              Mar 24, 2026
-            </span>
+            {loading ? (
+              <span className="block h-7 w-20 bg-border/30 rounded animate-pulse" />
+            ) : (
+              <span className="font-mono text-footnote text-text2">
+                {periodEnd || "—"}
+              </span>
+            )}
           </div>
         </div>
       </div>
