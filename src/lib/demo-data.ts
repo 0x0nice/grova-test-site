@@ -622,6 +622,27 @@ export const DEMO_BIZ_PENDING: FeedbackItem[] = [
 export function demoGet(path: string): unknown {
   if (path === "/projects") return DEMO_PROJECTS;
 
+  if (path.startsWith("/actions?feedback_id=")) return [];
+
+  if (path.match(/\/projects\/[^/]+\/action-settings/)) {
+    return {
+      actions_enabled: true,
+      owner_name: "Demo Owner",
+      reply_to_email: null,
+      brand_color: "#00c87a",
+      logo_url: null,
+      preferred_review_platform: "google",
+      review_url: null,
+      follow_up_enabled: true,
+      follow_up_delay_days: 7,
+      default_offer_type: "percentage_discount",
+      default_offer_value: "15%",
+      default_offer_expiry_days: 30,
+      escalation_email: null,
+      tone: "warm_casual",
+    };
+  }
+
   const feedbackMatch = path.match(/\/feedback\?project_id=([^&]+)/);
   if (feedbackMatch) {
     const pid = feedbackMatch[1];
@@ -660,6 +681,30 @@ export function demoPost(path: string): unknown {
       mode: "developer",
       created_at: new Date().toISOString(),
     };
+  }
+  if (path === "/actions/send") {
+    return {
+      success: true,
+      action_id: "demo-action-" + Date.now(),
+      resend_id: null,
+      status: "sent",
+    };
+  }
+  if (path === "/actions/draft") {
+    return {
+      success: true,
+      action_id: "demo-draft-" + Date.now(),
+      resend_id: null,
+      status: "draft",
+    };
+  }
+  return {};
+}
+
+/** Demo API interceptor for PUT requests */
+export function demoPut(path: string): unknown {
+  if (path.match(/\/projects\/[^/]+\/action-settings/)) {
+    return demoGet(path);
   }
   return {};
 }

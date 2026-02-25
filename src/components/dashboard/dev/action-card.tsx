@@ -3,14 +3,22 @@
 import { useState } from "react";
 import type { SuggestedAction } from "@/types/feedback";
 import { actionIcon } from "@/lib/triage";
-import { getTemplate, renderTemplate } from "@/lib/templates";
+import { getTemplate } from "@/lib/templates";
 import { ActionPreviewModal } from "./action-preview-modal";
 
 interface ActionCardProps {
   action: SuggestedAction;
+  feedbackId: string;
+  customerEmail?: string;
+  onActionSent?: () => void;
 }
 
-export function ActionCard({ action }: ActionCardProps) {
+export function ActionCard({
+  action,
+  feedbackId,
+  customerEmail,
+  onActionSent,
+}: ActionCardProps) {
   const [previewOpen, setPreviewOpen] = useState(false);
   const icon = actionIcon(action.type);
   const template = action.template_id ? getTemplate(action.template_id) : null;
@@ -54,6 +62,12 @@ export function ActionCard({ action }: ActionCardProps) {
           onClose={() => setPreviewOpen(false)}
           template={template}
           variables={action.template_variables || {}}
+          feedbackId={feedbackId}
+          actionType={action.type}
+          templateId={action.template_id!}
+          customerEmail={customerEmail}
+          requiresCustomerEmail={action.requires_customer_email}
+          onSent={onActionSent}
         />
       )}
     </>

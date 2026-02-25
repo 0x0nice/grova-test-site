@@ -74,6 +74,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
+      if (session) setIsDemo(false);
     });
 
     return () => subscription.unsubscribe();
@@ -87,6 +88,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
     if (error) throw error;
     setSession(data.session);
+    setIsDemo(false);
   }, []);
 
   const signUp = useCallback(async (email: string, password: string) => {

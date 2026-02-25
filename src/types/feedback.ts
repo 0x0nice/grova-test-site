@@ -74,3 +74,55 @@ export interface FeedbackItem {
   screenshot?: string;
   triage?: Triage;
 }
+
+export interface SentAction {
+  id: string;
+  feedback_id: string;
+  project_id: string;
+  action_type: string;
+  template_id: string;
+  template_variables: Record<string, string>;
+  email_to: string | null;
+  email_subject: string;
+  email_body_html: string;
+  status:
+    | "draft"
+    | "queued"
+    | "sent"
+    | "delivered"
+    | "opened"
+    | "clicked"
+    | "bounced"
+    | "failed";
+  resend_id: string | null;
+  sent_at: string | null;
+  opened_at: string | null;
+  clicked_at: string | null;
+  created_at: string;
+}
+
+export interface SendActionResponse {
+  success: boolean;
+  action_id: string | null;
+  resend_id: string | null;
+  status: string;
+  warning?: string;
+}
+
+export interface ActionSettings {
+  project_id?: string;
+  actions_enabled: boolean;
+  default_offer_type: string;
+  default_offer_value: string;
+  default_offer_expiry_days: number;
+  owner_name: string | null;
+  reply_to_email: string | null;
+  brand_color: string;
+  logo_url: string | null;
+  preferred_review_platform: string;
+  review_url: string | null;
+  follow_up_enabled: boolean;
+  follow_up_delay_days: number;
+  escalation_email: string | null;
+  tone: string;
+}

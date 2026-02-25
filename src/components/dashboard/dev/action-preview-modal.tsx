@@ -4,14 +4,23 @@ import { useState } from "react";
 import { Modal } from "@/components/ui/modal";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/toast";
+import { useAuth } from "@/providers/auth-provider";
 import type { EmailTemplate } from "@/lib/templates";
 import { renderTemplate } from "@/lib/templates";
+import { sendAction } from "@/lib/api";
+import { demoPost } from "@/lib/demo-data";
 
 interface ActionPreviewModalProps {
   open: boolean;
   onClose: () => void;
   template: EmailTemplate;
   variables: Record<string, string>;
+  feedbackId: string;
+  actionType: string;
+  templateId: string;
+  customerEmail?: string;
+  requiresCustomerEmail?: boolean;
+  onSent?: () => void;
 }
 
 export function ActionPreviewModal({
@@ -19,6 +28,12 @@ export function ActionPreviewModal({
   onClose,
   template,
   variables,
+  feedbackId,
+  actionType,
+  templateId,
+  customerEmail,
+  requiresCustomerEmail,
+  onSent,
 }: ActionPreviewModalProps) {
   const [subject, setSubject] = useState(() =>
     renderTemplate(template.subject, variables)
@@ -26,7 +41,12 @@ export function ActionPreviewModal({
   const [body, setBody] = useState(() =>
     renderTemplate(template.body, variables)
   );
+  const [emailTo, setEmailTo] = useState(customerEmail || "");
+  const [sending, setSending] = useState(false);
+  const [sent, setSent] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const { show } = useToast();
+  const { session, isDemo } = useAuth();
 
   function handleCopy() {
     const text = `Subject: ${subject}\n\n${body}`;
@@ -35,9 +55,78 @@ export function ActionPreviewModal({
     });
   }
 
+  async function handleSend() {
+    if (requiresCustomerEmail && !emailTo) {
+      setError("Customer email is required to send this action.");
+      return;
+    }
+
+    setSending(true);
+    setError(null);
+
+    try {
+      if (isDemo) {
+        demoPost("/actions/send");
+      } else {
+        const token = session?.access_token || "";
+        await sendAction(
+          {
+            feedback_id: feedbackId,
+            action_type: actionType,
+            template_id: templateId,
+            template_variables: variables,
+            email_to: emailTo || undefined,
+            subject,
+            body,
+          },
+          token
+        );
+      }
+      setSent(true);
+      show("Email sent successfully");
+      onSent?.();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to send email");
+    } finally {
+      setSending(false);
+    }
+  }
+
+  const needsEmailInput = requiresCustomerEmail && !customerEmail;
+
   return (
     <Modal open={open} onClose={onClose} title={template.name} maxWidth="560px">
       <div className="flex flex-col gap-4">
+        {/* Recipient email — shown when feedback has no email */}
+        {needsEmailInput && (
+          <div>
+            <label className="block font-mono text-micro text-text3 uppercase tracking-[0.12em] mb-1.5">
+              Recipient email
+            </label>
+            <input
+              type="email"
+              value={emailTo}
+              onChange={(e) => setEmailTo(e.target.value)}
+              placeholder="customer@example.com"
+              className="w-full bg-bg2 border border-border rounded px-3 py-2
+                         font-mono text-footnote text-text
+                         focus:outline-none focus:border-accent transition-colors"
+            />
+          </div>
+        )}
+
+        {/* Pre-filled email display */}
+        {customerEmail && (
+          <div className="flex items-baseline gap-3">
+            <span className="font-mono text-micro text-text3 uppercase tracking-[0.08em] shrink-0">
+              To
+            </span>
+            <span className="font-mono text-footnote text-text2">
+              {customerEmail}
+            </span>
+          </div>
+        )}
+
         <div>
           <label className="block font-mono text-micro text-text3 uppercase tracking-[0.12em] mb-1.5">
             Subject
@@ -63,6 +152,12 @@ export function ActionPreviewModal({
                        focus:outline-none focus:border-accent transition-colors resize-y"
           />
         </div>
+
+        {/* Error message */}
+        {error && (
+          <p className="font-mono text-micro text-red">{error}</p>
+        )}
+
         <div className="flex items-center gap-3">
           <Button variant="restore" onClick={onClose}>
             Close
@@ -70,6 +165,20 @@ export function ActionPreviewModal({
           <Button variant="copy" onClick={handleCopy}>
             Copy to clipboard
           </Button>
+          {!sent ? (
+            <Button
+              variant="primary"
+              onClick={handleSend}
+              loading={sending}
+              disabled={sending || (needsEmailInput && !emailTo)}
+            >
+              Send email
+            </Button>
+          ) : (
+            <span className="font-mono text-footnote text-accent">
+              Sent
+            </span>
+          )}
         </div>
       </div>
     </Modal>

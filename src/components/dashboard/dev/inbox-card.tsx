@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import type { FeedbackItem } from "@/types/feedback";
+import type { FeedbackItem, SentAction } from "@/types/feedback";
 import {
   effectiveScore,
   score as baseScore,
@@ -10,6 +10,7 @@ import {
   scoreAnchor,
   scoreClass,
   timeAgo,
+  actionIcon,
 } from "@/lib/triage";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -17,6 +18,9 @@ import { ScoreDisplay } from "./score-display";
 import { SubScoreGrid } from "./sub-score-grid";
 import { EnrichmentPanel } from "./enrichment-panel";
 import { ActionCard } from "./action-card";
+import { useAuth } from "@/providers/auth-provider";
+import { getActions } from "@/lib/api";
+import { demoGet } from "@/lib/demo-data";
 
 interface InboxCardProps {
   item: FeedbackItem;
@@ -24,9 +28,34 @@ interface InboxCardProps {
   onDeny: (id: string) => void;
 }
 
+function ActionStatusBadge({ status }: { status: string }) {
+  const styles: Record<string, string> = {
+    sent: "bg-accent/10 text-accent",
+    delivered: "bg-accent/10 text-accent",
+    opened: "bg-accent/20 text-accent",
+    clicked: "bg-accent/20 text-accent",
+    draft: "bg-bg2 text-text3",
+    queued: "bg-orange/10 text-orange",
+    failed: "bg-red/10 text-red",
+    bounced: "bg-red/10 text-red",
+  };
+  return (
+    <span
+      className={`font-mono text-micro uppercase tracking-[0.06em] px-2 py-0.5 rounded ${
+        styles[status] || "bg-bg2 text-text3"
+      }`}
+    >
+      {status}
+    </span>
+  );
+}
+
 export function InboxCard({ item, onApprove, onDeny }: InboxCardProps) {
   const [expanded, setExpanded] = useState(false);
   const [exiting, setExiting] = useState<"approve" | "deny" | null>(null);
+  const [sentActions, setSentActions] = useState<SentAction[]>([]);
+  const [actionsLoaded, setActionsLoaded] = useState(false);
+  const { session, isDemo } = useAuth();
 
   const es = effectiveScore(item);
   const base = baseScore(item);
@@ -35,12 +64,38 @@ export function InboxCard({ item, onApprove, onDeny }: InboxCardProps) {
   const anchor = scoreAnchor(es);
   const t = item.triage;
 
+  const loadActions = useCallback(() => {
+    const token = session?.access_token || "";
+    if (isDemo) {
+      setSentActions(demoGet(`/actions?feedback_id=${item.id}`) as SentAction[]);
+      setActionsLoaded(true);
+    } else {
+      getActions(item.id, token)
+        .then((data) => {
+          setSentActions(data);
+          setActionsLoaded(true);
+        })
+        .catch(() => setActionsLoaded(true));
+    }
+  }, [item.id, session?.access_token, isDemo]);
+
+  // Lazy-load action history when card is expanded
+  useEffect(() => {
+    if (expanded && !actionsLoaded) {
+      loadActions();
+    }
+  }, [expanded, actionsLoaded, loadActions]);
+
   function handleAction(action: "approve" | "deny") {
     setExiting(action);
     setTimeout(() => {
       if (action === "approve") onApprove(item.id);
       else onDeny(item.id);
     }, 320);
+  }
+
+  function handleActionSent() {
+    loadActions();
   }
 
   return (
@@ -233,7 +288,43 @@ export function InboxCard({ item, onApprove, onDeny }: InboxCardProps) {
                   </span>
                   <div className="flex flex-wrap gap-3">
                     {t.suggested_actions.map((action, i) => (
-                      <ActionCard key={i} action={action} />
+                      <ActionCard
+                        key={i}
+                        action={action}
+                        feedbackId={item.id}
+                        customerEmail={item.email}
+                        onActionSent={handleActionSent}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Action history */}
+              {actionsLoaded && sentActions.length > 0 && (
+                <div>
+                  <span className="block font-mono text-micro text-text3 uppercase tracking-[0.12em] mb-2.5">
+                    Action history
+                  </span>
+                  <div className="flex flex-col gap-2">
+                    {sentActions.map((sa) => (
+                      <div
+                        key={sa.id}
+                        className="flex items-center gap-3 bg-bg border border-border rounded px-3 py-2"
+                      >
+                        <span className="text-[0.85rem]">
+                          {actionIcon(sa.action_type)}
+                        </span>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-mono text-micro text-text2 truncate">
+                            {sa.email_subject}
+                          </p>
+                          <span className="font-mono text-micro text-text3">
+                            {sa.email_to || "No recipient"} · {timeAgo(sa.created_at)}
+                          </span>
+                        </div>
+                        <ActionStatusBadge status={sa.status} />
+                      </div>
                     ))}
                   </div>
                 </div>
