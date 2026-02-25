@@ -79,6 +79,11 @@ export default function RootLayout({
               </ErrorBoundary>
             </AnalyticsProvider>
           </ThemeProvider>
+          <script
+            src="https://grova.dev/grova-widget.js"
+            data-source="grova.dev"
+            defer
+          />
         </body>
     </html>
   );
