@@ -88,6 +88,10 @@ export function ActionPreviewModal({
         if (customerName && !variables.customer_name) {
           merged.customer_name = customerName;
         }
+        // Use first name only (e.g. "Jane Smith" → "Jane")
+        if (merged.customer_name && merged.customer_name !== "there") {
+          merged.customer_name = merged.customer_name.split(" ")[0];
+        }
         setSubject(renderTemplate(template.subject, merged));
         setBody(renderTemplate(template.body, merged));
       } catch {}
