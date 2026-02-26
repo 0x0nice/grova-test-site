@@ -57,11 +57,7 @@ export const useBizStore = create<BizState>((set) => ({
     try {
       if (isDemo) demoPost(`/feedback/${id}/approve`);
       else await apiPost(`/feedback/${id}/approve`, {}, token);
-      set((s) => ({
-        items: s.items.map((i) =>
-          i.id === id ? { ...i, status: "approved" as const } : i
-        ),
-      }));
+      set((s) => ({ items: s.items.filter((i) => i.id !== id) }));
     } catch {}
   },
 
@@ -69,11 +65,7 @@ export const useBizStore = create<BizState>((set) => ({
     try {
       if (isDemo) demoPost(`/feedback/${id}/deny`);
       else await apiPost(`/feedback/${id}/deny`, {}, token);
-      set((s) => ({
-        items: s.items.map((i) =>
-          i.id === id ? { ...i, status: "denied" as const } : i
-        ),
-      }));
+      set((s) => ({ items: s.items.filter((i) => i.id !== id) }));
     } catch {}
   },
 

@@ -7,7 +7,7 @@ import { useBizStore } from "@/stores/biz-store";
 import { isoWeek, buildInsightLines } from "@/lib/biz-helpers";
 import { InsightCard } from "@/components/dashboard/biz/insight-card";
 import { InsightProse } from "@/components/dashboard/biz/insight-prose";
-import { MessageRow } from "@/components/dashboard/biz/message-row";
+import { InboxCard } from "@/components/dashboard/dev/inbox-card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -107,13 +107,11 @@ export default function OverviewPage() {
           <span className="block font-mono text-micro text-text3 uppercase tracking-[0.14em] mb-3">
             Recent messages
           </span>
-          <div className="border border-border rounded overflow-hidden [html[data-theme=light]_&]:bg-white">
+          <div className="flex flex-col gap-3">
             {recent.map((item) => (
-              <MessageRow
+              <InboxCard
                 key={item.id}
                 item={item}
-                showScore
-                isDemo={isDemo}
                 onApprove={(id) => approve(id, session?.access_token || "demo", isDemo)}
                 onDeny={(id) => deny(id, session?.access_token || "demo", isDemo)}
               />
