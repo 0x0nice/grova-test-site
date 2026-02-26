@@ -32,7 +32,7 @@ export function Hero() {
           <motion.div key="dev" {...crossfade}>
             <span
               {...fadeUp(50)}
-              className="block text-[0.64rem] tracking-[0.16em] uppercase mb-[34px] text-orange"
+              className="block text-[0.72rem] tracking-[0.16em] uppercase mb-[34px] text-orange"
             >
               Feedback triage for developers
             </span>
@@ -46,7 +46,7 @@ export function Hero() {
             </h1>
             <p
               {...fadeUp(250)}
-              className="text-[0.94rem] text-text2 leading-[1.85] max-w-[500px] mb-[44px] font-light"
+              className="text-[1.06rem] text-text2 leading-[1.85] max-w-[500px] mb-[44px] font-light"
             >
               Grova captures user feedback, filters the noise, and delivers ranked
               fix briefs straight to your inbox — ready to drop into Cursor or
@@ -54,7 +54,7 @@ export function Hero() {
             </p>
             <div {...fadeUp(350)}>
               <WaitlistForm />
-              <p className="mt-2.5 text-[0.62rem] text-text3 tracking-[0.04em]">
+              <p className="mt-2.5 text-[0.7rem] text-text3 tracking-[0.04em]">
                 No spam. Unsubscribe any time.
               </p>
             </div>
@@ -63,7 +63,7 @@ export function Hero() {
           <motion.div key="biz" {...crossfade}>
             <span
               {...fadeUp(50)}
-              className="block text-[0.64rem] tracking-[0.16em] uppercase mb-[34px] text-accent"
+              className="block text-[0.72rem] tracking-[0.16em] uppercase mb-[34px] text-accent"
             >
               Smart feedback for your business
             </span>
@@ -77,7 +77,7 @@ export function Hero() {
             </h1>
             <p
               {...fadeUp(250)}
-              className="text-[0.94rem] text-text2 leading-[1.85] max-w-[540px] mb-[44px] font-light"
+              className="text-[1.06rem] text-text2 leading-[1.85] max-w-[540px] mb-[44px] font-light"
             >
               Grova makes it easy for customers to share honest feedback — through
               a widget on your site, a QR code at your register, or a simple
@@ -90,7 +90,7 @@ export function Hero() {
               <Link
                 href="/login?mode=signup"
                 className="bg-accent text-black rounded px-6 py-3
-                           font-mono text-[0.75rem] font-semibold tracking-[0.04em]
+                           font-mono text-[0.85rem] font-semibold tracking-[0.04em]
                            no-underline inline-flex items-center gap-2
                            transition-opacity duration-[180ms] hover:opacity-85"
               >
@@ -98,7 +98,7 @@ export function Hero() {
               </Link>
               <a
                 href="#pipeline"
-                className="text-[0.76rem] text-text2 font-light hover:text-accent transition-colors"
+                className="text-[0.85rem] text-text2 font-light hover:text-accent transition-colors"
               >
                 See how it works ↓
               </a>

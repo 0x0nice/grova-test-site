@@ -42,7 +42,7 @@ function Tag({ type }: { type: "auto" | "you" }) {
       ? "text-accent border-accent/30 bg-accent/[0.07]"
       : "text-orange border-orange/30 bg-orange/[0.07]";
   return (
-    <span className={`text-[0.52rem] tracking-[0.09em] uppercase px-1.5 py-[2px] rounded-pill inline-block border ${cls}`}>
+    <span className={`text-[0.6rem] tracking-[0.09em] uppercase px-1.5 py-[2px] rounded-pill inline-block border ${cls}`}>
       {type}
     </span>
   );
@@ -57,10 +57,10 @@ export function BizPipelineSection() {
       <div className="grid grid-cols-5 border border-border rounded overflow-hidden max-lg:grid-cols-3 max-lg:[&>*:nth-child(3)]:border-r-0 max-lg:[&>*:nth-child(-n+3)]:border-b max-lg:[&>*:nth-child(-n+3)]:border-b-border max-md:grid-cols-1 max-md:[&>*]:border-r-0 max-md:[&>*]:border-b max-md:[&>*]:border-b-border max-md:[&>*:last-child]:border-b-0">
         {steps.map((s) => (
           <div key={s.num} className="p-[18px_14px] border-r border-border last:border-r-0">
-            <span className="text-[0.54rem] text-text3 tracking-[0.1em] block mb-2">{s.num}</span>
-            <span className="text-[0.9rem] block mb-[7px]">{s.icon}</span>
+            <span className="text-[0.62rem] text-text3 tracking-[0.1em] block mb-2">{s.num}</span>
+            <span className="text-[1rem] block mb-[7px]">{s.icon}</span>
             <span className="text-footnote text-text font-medium block leading-[1.4] mb-1.5">{s.title}</span>
-            <p className="text-[0.66rem] text-text2 leading-[1.7] font-light mb-[9px]">{s.desc}</p>
+            <p className="text-[0.78rem] text-text2 leading-[1.7] font-light mb-[9px]">{s.desc}</p>
             <Tag type={s.tag} />
           </div>
         ))}

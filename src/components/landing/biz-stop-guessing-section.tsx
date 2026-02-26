@@ -7,7 +7,7 @@ export function BizStopGuessingSection() {
           <br />
           <em className="text-text2">Start knowing.</em>
         </h2>
-        <p className="text-[0.86rem] text-text2 leading-[1.85] font-light pt-1">
+        <p className="text-[0.98rem] text-text2 leading-[1.85] font-light pt-1">
           Most businesses have no real system for hearing from customers.
           Comment cards get ignored. Conversations get forgotten. Grova gives
           every customer an easy way to tell you what they think — then filters

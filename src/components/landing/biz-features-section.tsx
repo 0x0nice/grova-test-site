@@ -55,7 +55,7 @@ export function BizFeaturesSection() {
           <br />
           <em className="text-text2">Nothing you don&apos;t.</em>
         </h2>
-        <p className="text-[0.86rem] text-text2 leading-[1.85] font-light pt-1">
+        <p className="text-[0.98rem] text-text2 leading-[1.85] font-light pt-1">
           Built for business owners who&apos;d rather run their business than stare
           at analytics dashboards. No jargon, no complexity, no enterprise
           nonsense.
@@ -70,11 +70,11 @@ export function BizFeaturesSection() {
               ${i >= 6 ? "border-b-0" : ""}
             `}
           >
-            <span className="text-[1.05rem] block mb-3.5">{f.icon}</span>
-            <h3 className="font-serif text-[1rem] font-normal tracking-[-0.01em] mb-[9px] text-text">
+            <span className="text-[1.18rem] block mb-3.5">{f.icon}</span>
+            <h3 className="font-serif text-[1.12rem] font-normal tracking-[-0.01em] mb-[9px] text-text">
               {f.title}
             </h3>
-            <p className="text-[0.75rem] text-text2 leading-[1.8] font-light">{f.desc}</p>
+            <p className="text-[0.87rem] text-text2 leading-[1.8] font-light">{f.desc}</p>
           </div>
         ))}
       </div>

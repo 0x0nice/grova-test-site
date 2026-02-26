@@ -171,7 +171,7 @@ function PriceCard({ tier: t, isBiz }: { tier: PriceTier; isBiz: boolean }) {
         <span className={`absolute top-0 left-0 right-0 h-[1px] ${accentLine}`} />
       )}
       {t.popular && (
-        <span className={`text-[0.54rem] ${accentPop} tracking-[0.12em] uppercase block mb-2.5`}>
+        <span className={`text-[0.62rem] ${accentPop} tracking-[0.12em] uppercase block mb-2.5`}>
           Most popular
         </span>
       )}
@@ -179,18 +179,18 @@ function PriceCard({ tier: t, isBiz }: { tier: PriceTier; isBiz: boolean }) {
         {t.tier}
       </span>
       <div className="font-serif text-[2.2rem] text-text font-normal tracking-[-0.03em] leading-none mb-1">
-        {t.amount} <span className="font-mono text-[0.66rem] text-text3 font-light">/mo</span>
+        {t.amount} <span className="font-mono text-[0.76rem] text-text3 font-light">/mo</span>
       </div>
-      <p className="text-[0.7rem] text-text2 leading-[1.7] my-2.5 font-light">{t.desc}</p>
+      <p className="text-[0.8rem] text-text2 leading-[1.7] my-2.5 font-light">{t.desc}</p>
       <ul className="list-none flex flex-col gap-[7px] flex-1 mb-5">
         {t.features.map((f, i) => (
-          <li key={i} className={`text-[0.66rem] font-light pl-4 relative leading-[1.5] ${f.yes ? "text-text" : "text-text3"}`}>
+          <li key={i} className={`text-[0.76rem] font-light pl-4 relative leading-[1.5] ${f.yes ? "text-text" : "text-text3"}`}>
             <span className={`absolute left-0 ${f.yes ? accentCheck : "text-border2"}`}>
               {f.yes ? "✓" : "—"}
             </span>
             {f.text}
             {f.soon && (
-              <span className="text-[0.5rem] text-orange border border-orange/30 bg-orange/[0.07] px-[5px] py-[1px] rounded-pill tracking-[0.06em] uppercase ml-1 align-middle">
+              <span className="text-[0.58rem] text-orange border border-orange/30 bg-orange/[0.07] px-[5px] py-[1px] rounded-pill tracking-[0.06em] uppercase ml-1 align-middle">
                 soon
               </span>
             )}
@@ -245,7 +245,7 @@ export function PricingGrid() {
             <>Start free.<br /><em className="text-text2">Upgrade when it clicks.</em></>
           )}
         </h2>
-        <p className="text-[0.86rem] text-text2 leading-[1.85] font-light pt-1">
+        <p className="text-[0.98rem] text-text2 leading-[1.85] font-light pt-1">
           {track === "dev"
             ? "No credit card to start. Upgrade when Grova earns it. Per-project pricing — not per seat — because you\u2019re building alone."
             : "Free gets you collecting. Paid gets you understanding. No credit card to start. No contracts. Cancel anytime."}

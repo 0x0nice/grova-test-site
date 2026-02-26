@@ -28,7 +28,7 @@ export function StepsSection() {
           <br />
           <em className="text-text2">Ship what matters.</em>
         </h2>
-        <p className="text-[0.86rem] text-text2 leading-[1.85] font-light pt-1">
+        <p className="text-[0.98rem] text-text2 leading-[1.85] font-light pt-1">
           Most feedback is junk. Vague complaints, duplicate requests, one-off edge cases.
           Grova filters automatically so only real, actionable issues reach you — pre-scored
           and ready to act on.
@@ -37,16 +37,16 @@ export function StepsSection() {
       <div className="grid grid-cols-3 border border-border rounded overflow-hidden max-md:grid-cols-1 max-md:[&>*]:border-r-0 max-md:[&>*]:border-b max-md:[&>*]:border-b-border max-md:[&>*:last-child]:border-b-0">
         {steps.map((s) => (
           <div key={s.num} className="bg-bg p-[28px_22px] border-r border-border last:border-r-0 [html[data-theme=light]_&]:bg-surface">
-            <span className="text-[0.54rem] text-orange tracking-[0.12em] uppercase block mb-3">
+            <span className="text-[0.62rem] text-orange tracking-[0.12em] uppercase block mb-3">
               {s.badge}
             </span>
             <div className="font-serif text-[2.4rem] text-text leading-none mb-4 font-normal opacity-15">
               {s.num}
             </div>
-            <h3 className="font-serif text-[1.05rem] font-normal tracking-[-0.01em] mb-2.5 text-text leading-[1.2]">
+            <h3 className="font-serif text-[1.18rem] font-normal tracking-[-0.01em] mb-2.5 text-text leading-[1.2]">
               {s.title}
             </h3>
-            <p className="text-[0.75rem] text-text2 leading-[1.8] font-light">{s.desc}</p>
+            <p className="text-[0.87rem] text-text2 leading-[1.8] font-light">{s.desc}</p>
           </div>
         ))}
       </div>
