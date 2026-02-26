@@ -57,38 +57,38 @@
   --radius-xl: 4px;
   --radius-pill: 100px;
 
-  /* --- Typography Scale --- */
-  --text-display: 2.6rem;
+  /* --- Typography Scale (bumped ~15-20% for readability) --- */
+  --text-display: 2.8rem;
   --text-display--line-height: 1;
   --text-display--letter-spacing: -0.02em;
 
-  --text-headline: 1.9rem;
+  --text-headline: 2.1rem;
   --text-headline--line-height: 1.1;
   --text-headline--letter-spacing: -0.02em;
 
-  --text-title: 1.4rem;
+  --text-title: 1.55rem;
   --text-title--line-height: 1.2;
   --text-title--letter-spacing: -0.01em;
 
-  --text-body: 0.82rem;
+  --text-body: 0.95rem;
   --text-body--line-height: 1.65;
 
-  --text-callout: 0.78rem;
+  --text-callout: 0.9rem;
   --text-callout--line-height: 1.55;
 
-  --text-subheadline: 0.72rem;
+  --text-subheadline: 0.835rem;
   --text-subheadline--line-height: 1.55;
   --text-subheadline--letter-spacing: 0.04em;
 
-  --text-footnote: 0.68rem;
+  --text-footnote: 0.79rem;
   --text-footnote--line-height: 1.5;
   --text-footnote--letter-spacing: 0.04em;
 
-  --text-caption: 0.6rem;
+  --text-caption: 0.7rem;
   --text-caption--line-height: 1.4;
   --text-caption--letter-spacing: 0.08em;
 
-  --text-micro: 0.5rem;
+  --text-micro: 0.6rem;
   --text-micro--line-height: 1.3;
   --text-micro--letter-spacing: 0.1em;
 
@@ -127,6 +127,24 @@
   --text: #080808;
   --text2: #333333;
   --text3: #888888;
+}
+
+/* ===================================================================
+   FONT SCALE — runtime multiplier for accessibility text sizing
+   Overrides @theme inline values with calc() so slider works in real-time.
+   Default --font-scale: 1 (presets: 0.88 / 1 / 1.14 / 1.28)
+   =================================================================== */
+:root {
+  --font-scale: 1;
+  --text-display: calc(2.8rem * var(--font-scale));
+  --text-headline: calc(2.1rem * var(--font-scale));
+  --text-title: calc(1.55rem * var(--font-scale));
+  --text-body: calc(0.95rem * var(--font-scale));
+  --text-callout: calc(0.9rem * var(--font-scale));
+  --text-subheadline: calc(0.835rem * var(--font-scale));
+  --text-footnote: calc(0.79rem * var(--font-scale));
+  --text-caption: calc(0.7rem * var(--font-scale));
+  --text-micro: calc(0.6rem * var(--font-scale));
 }
 
 /* ===================================================================
@@ -226,4 +244,61 @@
 :root {
   --track-accent: #00c87a;
   --track-accent-dim: rgba(0, 200, 122, 0.1);
+}
+
+/* ===================================================================
+   FONT SIZE SLIDER — Apple Dynamic Type style
+   =================================================================== */
+.font-size-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 100px;
+  background: var(--border);
+  outline: none;
+  cursor: pointer;
+  transition: background 0.18s ease;
+}
+
+.font-size-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--text);
+  border: 3px solid var(--surface);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.font-size-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.12);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(0, 0, 0, 0.1);
+}
+
+.font-size-slider::-webkit-slider-thumb:active {
+  transform: scale(1.05);
+}
+
+.font-size-slider::-moz-range-thumb {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--text);
+  border: 3px solid var(--surface);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+}
+
+.font-size-slider::-moz-range-track {
+  height: 6px;
+  border-radius: 100px;
+  background: var(--border);
+}
+
+.font-size-slider:focus-visible::-webkit-slider-thumb {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
 }

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { instrumentSerif, geistMono } from "@/lib/fonts";
 import { ThemeProvider } from "@/providers/theme-provider";
+import { FontSizeProvider } from "@/providers/font-size-provider";
 import { AnalyticsProvider } from "@/providers/analytics-provider";
 import { ToastProvider } from "@/components/ui/toast";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
@@ -59,6 +60,12 @@ export default function RootLayout({
             __html: `(function(){try{var t=localStorage.getItem('grova-theme');if(t){document.documentElement.setAttribute('data-theme',t)}else if(window.matchMedia('(prefers-color-scheme:light)').matches){document.documentElement.setAttribute('data-theme','light')}}catch(e){}})()`,
           }}
         />
+        {/* Prevent flash of wrong font size */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var p=localStorage.getItem('grova-font-size');if(p!==null){var m={0:0.88,1:1,2:1.14,3:1.28};var s=m[Number(p)];if(s)document.documentElement.style.setProperty('--font-scale',String(s))}}catch(e){}})()`,
+          }}
+        />
       </head>
       <body>
           {/* Skip to main content link for keyboard navigation */}
@@ -70,14 +77,16 @@ export default function RootLayout({
             Skip to main content
           </a>
           <ThemeProvider>
-            <AnalyticsProvider>
-              <ErrorBoundary>
-                <ToastProvider>
-                  {children}
-                  <CookieConsent />
-                </ToastProvider>
-              </ErrorBoundary>
-            </AnalyticsProvider>
+            <FontSizeProvider>
+              <AnalyticsProvider>
+                <ErrorBoundary>
+                  <ToastProvider>
+                    {children}
+                    <CookieConsent />
+                  </ToastProvider>
+                </ErrorBoundary>
+              </AnalyticsProvider>
+            </FontSizeProvider>
           </ThemeProvider>
           <script
             src="https://grova.dev/grova-business-widget.js"

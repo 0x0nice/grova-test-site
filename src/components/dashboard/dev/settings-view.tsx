@@ -10,6 +10,7 @@ import { useAuth } from "@/providers/auth-provider";
 import { getActionSettings, putActionSettings } from "@/lib/api";
 import { demoGet } from "@/lib/demo-data";
 import type { ActionSettings } from "@/types/feedback";
+import { FontSizeControl } from "@/components/ui/font-size-control";
 
 /* ------------------------------------------------------------------ */
 /*  Icons                                                              */
@@ -212,6 +213,15 @@ export function SettingsView() {
             </div>
           </div>
         )}
+      </Section>
+
+      {/* ── Appearance ── */}
+      <Section>
+        <SectionHeader
+          title="Appearance"
+          description="Adjust the text size across the entire dashboard."
+        />
+        <FontSizeControl />
       </Section>
 
       {/* ── Triage Lens ── */}

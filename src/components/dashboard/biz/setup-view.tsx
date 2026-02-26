@@ -7,6 +7,7 @@ import { useProjectStore } from "@/stores/project-store";
 import { useBizStore, type BizConfig } from "@/stores/biz-store";
 import { CAT_PRESETS } from "@/lib/cat-presets";
 import { useToast } from "@/components/ui/toast";
+import { FontSizeControl } from "@/components/ui/font-size-control";
 
 /* ------------------------------------------------------------------ */
 /*  Eyeball toggle icon                                                */
@@ -228,6 +229,15 @@ export function SetupView() {
           </div>
         </Section>
       )}
+
+      {/* ── Appearance ── */}
+      <Section>
+        <SectionHeader
+          title="Appearance"
+          description="Adjust the text size across the entire dashboard."
+        />
+        <FontSizeControl />
+      </Section>
 
       {/* ── Business Profile ── */}
       <Section>
