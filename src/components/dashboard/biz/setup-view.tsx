@@ -71,6 +71,9 @@ export function SetupView() {
   const source = active?.source || "your-business-id";
   const catStr = config.categories.join(",");
   let snippet = `<script\n  src="https://grova.dev/grova-business-widget.js"\n  data-source="${source}"`;
+  if (active?.api_key) {
+    snippet += `\n  data-key="${active.api_key}"`;
+  }
   if (config.type && config.type !== "default") {
     snippet += `\n  data-business-type="${config.type}"`;
   }
@@ -86,10 +89,38 @@ export function SetupView() {
     navigator.clipboard.writeText(snippet).then(() => show("Snippet copied"));
   }
 
+  const [keyCopied, setKeyCopied] = useState(false);
+
   if (!active) return null;
 
   return (
     <div className="max-w-[640px]">
+      {/* Project info */}
+      {active.api_key && (
+        <div className="mb-10">
+          <span className="block font-mono text-micro text-text3 uppercase tracking-[0.14em] mb-4">
+            Project info
+          </span>
+          <div className="flex items-baseline gap-3">
+            <span className="font-mono text-micro text-text3 uppercase tracking-[0.08em] w-16 shrink-0">
+              API Key
+            </span>
+            <span className="font-mono text-footnote text-accent break-all">{active.api_key}</span>
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText(active.api_key!);
+                setKeyCopied(true);
+                setTimeout(() => setKeyCopied(false), 2000);
+                show("API key copied");
+              }}
+              className="font-mono text-micro text-text3 hover:text-text2 transition-colors cursor-pointer shrink-0"
+            >
+              {keyCopied ? "Copied!" : "Copy"}
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Business profile */}
       <div className="mb-10">
         <span className="block font-mono text-micro text-text3 uppercase tracking-[0.14em] mb-4">

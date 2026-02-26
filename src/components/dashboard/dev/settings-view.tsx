@@ -92,7 +92,7 @@ export function SettingsView() {
           <InfoRow label="Source" value={active.source || "—"} />
           <InfoRow label="Mode" value={active.mode} />
           {active.api_key && (
-            <InfoRow label="API Key" value={active.api_key} />
+            <CopyableRow label="API Key" value={active.api_key} />
           )}
         </div>
       </div>
@@ -277,6 +277,28 @@ function InfoRow({ label, value }: { label: string; value: string }) {
         {label}
       </span>
       <span className="font-mono text-footnote text-text2">{value}</span>
+    </div>
+  );
+}
+
+function CopyableRow({ label, value }: { label: string; value: string }) {
+  const [copied, setCopied] = useState(false);
+  return (
+    <div className="flex items-baseline gap-3">
+      <span className="font-mono text-micro text-text3 uppercase tracking-[0.08em] w-16 shrink-0">
+        {label}
+      </span>
+      <span className="font-mono text-footnote text-accent break-all">{value}</span>
+      <button
+        onClick={() => {
+          navigator.clipboard.writeText(value);
+          setCopied(true);
+          setTimeout(() => setCopied(false), 2000);
+        }}
+        className="font-mono text-micro text-text3 hover:text-text2 transition-colors cursor-pointer shrink-0"
+      >
+        {copied ? "Copied!" : "Copy"}
+      </button>
     </div>
   );
 }
